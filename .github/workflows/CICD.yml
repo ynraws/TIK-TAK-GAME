@@ -32,3 +32,19 @@ jobs:
           docker push itsmeynr/tic-tac-toe:latest
         env: 
           DOCKER_CLI_ACI: 1    
+
+      - name: Image Scan 
+        run: trivy image itsmeynr/tic-tac-toe:latest > trivyimage.txt
+
+  deploy:
+    needs: build-analyze-scan
+    runs-on: [self-hosted]
+    steps:   
+      - name: docker pull image
+        run: docker pull sitsmeynr/tic-tac-toe:latest
+
+      - name: Image scan
+        run: trivy image itsmeynr/tic-tac-toe:latest > trivyimagedeploy.txt
+
+      - name: Deploy to container
+        run: docker run -d --name game -p 3000:3000 itsmeynr/tic-tac-toe:latest
